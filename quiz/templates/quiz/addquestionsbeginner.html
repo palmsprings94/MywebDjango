@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }}</title>
+</head>
+<body>
+    <a href="{% url 'home' %}">Home</a>
+    <h1>Below are your listed beginner exam questions:</h1>
+    <h3>
+        {% for i in questions %}
+            {{ i.title }}<br>
+            {{ i.qbody }}<br>
+            {{ i.c1 }}<br>
+            {{ i.c2 }}<br>
+            {{ i.c3 }}<br>
+            {{ i.correctans }}<br><br>
+        {% endfor %}
+    </h3>
+    <form method="post">
+        {% csrf_token %}
+        {{ submissions.as_p }}
+        <button type="submit">Submit</button>
+    </form>
+</body>
+</html>

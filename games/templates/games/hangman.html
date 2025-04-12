@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }}</title>
+</head>
+<body>
+    <a href="{% url 'home' %}">Home</a>
+    <h1>Welcome to hangman!</h1>
+    <h3>
+        Category: {{ baksi.category }}<br>
+        {% for i in baksi.disp %}
+            {{ i  }}
+        {% endfor %}<br><br>
+        Lives: {{ baksi.lives }}<br>
+        Non-included words: {{ baksi.nonletters }}<br><br>
+        {% if gameover %}
+            {{ msg }}<br>
+            The word is {{ baksi.word }}<br>
+            Play again? 'y' or 'n'<br>
+        {% endif %}
+        <form method="POST">
+            {% csrf_token %}
+            {{ subm.as_p }}
+            <button type="submit">Submit</button>
+        </form>
+    </h3>
+</body>
+</html>

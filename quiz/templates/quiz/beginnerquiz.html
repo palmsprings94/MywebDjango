@@ -1,0 +1,30 @@
+{% load quizfilters %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }}</title>
+</head>
+<body>
+    <a href="{% url 'home' %}">Home</a>
+    {% if score >= 0 %}
+        <h1>Score = {{ score }} out of {{ num }}</h1>
+    {% endif %}
+    <h1>Type the corresponding letter to your answer.</h1>
+    <h3>
+    {% for i in numlist %}
+        {% with questions|get_item:i as q %}
+            {{ q.qbody }}<br><br>
+            A {{ q.c1 }}<br>
+            B {{ q.c2 }}<br>
+            C {{ q.c3 }}<br><br>
+        {% endwith %}
+    {% endfor %}
+    </h3>
+    <form method="POST">
+        {% csrf_token %}
+        {{ subm.as_p }}
+        <button type="submit">Submit</button>
+    </form>
+</body>
+</html>

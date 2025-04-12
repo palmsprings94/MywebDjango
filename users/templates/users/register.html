@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }}</title>
+</head>
+<body>
+    {% if msg is not None %}
+        <h2>{{ msg }}</h2><br>
+    {% endif %}
+    <form method="POST">
+        {% csrf_token %}
+        {{ subm.as_p }}
+        <button type="submit">Submit</button>
+    </form>
+</body>
+</html>
