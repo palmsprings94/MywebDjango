@@ -361,6 +361,7 @@ def tictactoe(request):
     player = request.session.get('p', 'ZZZ')
     comp = request.session.get('c', 'ZZZ')
     gofirst = request.session.get('1st', None)
+    lastmove = request.session.get('last', None)
     msg = ""
 
 
@@ -384,10 +385,13 @@ def tictactoe(request):
                     elif subm.cleaned_data.get('answer').upper() == 'N':
                         request.session['1st'] = False
                         aimove()
+                        request.session['last'] = 'notme'
                         return redirect('tictactoe')
                     msg = "type the number where you want to make a move"
     elif (' ' not in tgame['avai'].values()) or win():
-        msg = "Gameover! Play again? Y/N"
+        if win() and lastmove == 'me': msg = "You Win! Play again? Y/N"
+        elif win() and lastmove == 'notme': msg = "You Lose! Play again? Y/N"
+        else: msg = "Gameover! Play again? Y/N"
         if request.method == 'POST':
             subm = forms.Inputletter(request.POST)
             if subm.is_valid():
@@ -406,8 +410,10 @@ def tictactoe(request):
                 if tgame['avai'][subm.cleaned_data.get('answer')] == ' ':
                     tgame['avai'][subm.cleaned_data.get('answer')] = player
                     request.session['t'] = tgame
+                    request.session['last'] = 'me'
                     if not win() and ' ' in tgame['avai'].values():
                         aimove()
+                        request.session['last'] = 'notme'
                         return redirect('tictactoe')
                     return redirect('tictactoe')
 
@@ -416,6 +422,7 @@ def tictactoe(request):
     subm = forms.Inputletter()
     context = {
         'title': 'TicTacToe',
+        'tgame': tgame,
         'subm': subm,
         'msg': msg,
         'ldisp': ldisp,

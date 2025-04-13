@@ -1,20 +1,76 @@
+{% load gamefilters %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>{{ title }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f0f0;
+            text-align: center;
+            padding-top: 50px;
+        }
+        h1 {
+            margin-bottom: 10px;
+        }
+        .msg {
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+        }
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 80px);
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .cell-btn {
+            height: 80px;
+            width: 80px;
+            font-size: 2rem;
+            font-weight: bold;
+            background: white;
+            border: 2px solid #555;
+            cursor: pointer;
+        }
+        .cell-btn:disabled {
+            background: #ddd;
+            color: #aaa;
+            cursor: not-allowed;
+        }
+        .form-section {
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
-    {% for x,y in ldisp.items %}
-        {{ y }}<br>
-    {% endfor %}
-    <br>
-    {{ msg }}<br>
+    <h1>Tic Tac Toe</h1>
+
+    <div class="msg">{{ msg }}</div>
+
     <form method="POST">
         {% csrf_token %}
-        {{ subm }}
-        <button type="submit">Submit</button>
-    </form>
 
+        {% if msg == "type the number where you want to make a move" %}
+            <div class="board">
+                {% for i in "123456789" %}
+                    <button
+                        class="cell-btn"
+                        name="answer"
+                        value="{{ i }}"
+                        {% if tgame.avai|val:i != ' ' %}disabled{% endif %}
+                    >
+                        {{ tgame.avai|val:i }}
+                    </button>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="form-section">
+                {{ subm.answer }}
+                <button type="submit">Submit</button>
+            </div>
+        {% endif %}
+    </form>
 </body>
 </html>
