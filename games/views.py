@@ -313,3 +313,111 @@ def Oregontrail(request):
         'choice4': choice4,
     }
     return render(request, 'games/oregontrail.html', context)
+
+
+def tictactoe(request):
+
+
+    def aimove():
+        num = random.choice(list(tgame['avai'].keys()))
+        while tgame['avai'][num] != ' ':
+            num = random.choice(list(tgame['avai'].keys()))
+        tgame['avai'][num] = comp
+        request.session['t'] = tgame
+    def win():
+        if (
+            (tgame['avai']['1'] == tgame['avai']['2'] == tgame['avai']['3'] != ' ') or
+            (tgame['avai']['4'] == tgame['avai']['5'] == tgame['avai']['6'] != ' ') or
+            (tgame['avai']['7'] == tgame['avai']['8'] == tgame['avai']['9'] != ' ') or
+            (tgame['avai']['1'] == tgame['avai']['4'] == tgame['avai']['7'] != ' ') or
+            (tgame['avai']['2'] == tgame['avai']['5'] == tgame['avai']['8'] != ' ') or
+            (tgame['avai']['3'] == tgame['avai']['6'] == tgame['avai']['9'] != ' ') or
+            (tgame['avai']['1'] == tgame['avai']['5'] == tgame['avai']['9'] != ' ') or
+            (tgame['avai']['3'] == tgame['avai']['5'] == tgame['avai']['7'] != ' ')
+        ): return True
+
+
+    tini = {
+        'avai': {
+            '1': ' ',
+            '2': ' ',
+            '3': ' ',
+            '4': ' ',
+            '5': ' ',
+            '6': ' ',
+            '7': ' ',
+            '8': ' ',
+            '9': ' '
+        }
+    }
+    tgame = request.session.get('t', tini)
+    ldisp = {
+        'line1': f"{tgame['avai']['1']}|{tgame['avai']['2']}|{tgame['avai']['3']}",
+        'line2': f"{tgame['avai']['4']}|{tgame['avai']['5']}|{tgame['avai']['6']}",
+        'line3': f"{tgame['avai']['7']}|{tgame['avai']['8']}|{tgame['avai']['9']}",
+    }
+
+
+    player = request.session.get('p', 'ZZZ')
+    comp = request.session.get('c', 'ZZZ')
+    gofirst = request.session.get('1st', None)
+    msg = ""
+
+
+    if tgame == tini and player == 'ZZZ':
+        msg = "O or X?"
+        if request.method == 'POST':
+            subm = forms.Inputletter(request.POST)
+            if subm.is_valid():
+                if subm.cleaned_data.get('answer').upper() == 'O' or subm.cleaned_data.get('answer').upper() == 'X':
+                    request.session['p'] = subm.cleaned_data.get('answer').upper()
+                    if subm.cleaned_data.get('answer').upper() == 'O': request.session['c'] = 'X'
+                    else: request.session['c'] = 'O'
+                    msg = "Go first? Y/N"
+    elif tgame == tini and gofirst is None:
+        msg = "Go first? Y/N"
+        if request.method == 'POST':
+            subm = forms.Inputletter(request.POST)
+            if subm.is_valid():
+                if subm.cleaned_data.get('answer').upper() == 'Y' or subm.cleaned_data.get('answer').upper() == 'N':
+                    if subm.cleaned_data.get('answer').upper() == 'Y': request.session['1st'] = True
+                    elif subm.cleaned_data.get('answer').upper() == 'N':
+                        request.session['1st'] = False
+                        aimove()
+                        return redirect('tictactoe')
+                    msg = "type the number where you want to make a move"
+    elif (' ' not in tgame['avai'].values()) or win():
+        msg = "Gameover! Play again? Y/N"
+        if request.method == 'POST':
+            subm = forms.Inputletter(request.POST)
+            if subm.is_valid():
+                if subm.cleaned_data.get('answer').upper() == 'Y' or subm.cleaned_data.get('answer').upper() == 'N':
+                    if subm.cleaned_data.get('answer').upper() == 'Y':
+                        request.session.clear()
+                        return redirect('tictactoe')
+                    elif subm.cleaned_data.get('answer').upper() == 'N':
+                        request.session.clear()
+                        return redirect('games')
+    else:
+        msg = "type the number where you want to make a move"
+        if request.method == 'POST':
+            subm = forms.Inputletter(request.POST)
+            if subm.is_valid() and subm.cleaned_data.get('answer') in tgame['avai'].keys():
+                if tgame['avai'][subm.cleaned_data.get('answer')] == ' ':
+                    tgame['avai'][subm.cleaned_data.get('answer')] = player
+                    request.session['t'] = tgame
+                    if not win() and ' ' in tgame['avai'].values():
+                        aimove()
+                        return redirect('tictactoe')
+                    return redirect('tictactoe')
+
+
+    request.session['t'] = tgame
+    subm = forms.Inputletter()
+    context = {
+        'title': 'TicTacToe',
+        'subm': subm,
+        'msg': msg,
+        'ldisp': ldisp,
+    }
+    return render(request, 'games/tictactoe.html', context)

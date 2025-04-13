@@ -4,4 +4,5 @@ urlpatterns = [
     path('', views.games, name='games'),
     path('hangman/', views.hangman, name='hangman'),
     path('oregontrail/', views.Oregontrail, name='oregontrail'),
+    path('tictactoe/', views.tictactoe, name='tictactoe'),
 ]
