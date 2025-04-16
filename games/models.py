@@ -29,3 +29,8 @@ class Oregontrailevents(models.Model):
     numeffect = models.IntegerField()
     def __str__(self): return self.name
 
+
+
+class Scores(models.Model):
+    gamename = models.CharField(default=None)
+    score = models.IntegerField()

@@ -1,4 +1,3 @@
-from itertools import chain
 
 from django.shortcuts import render, redirect
 from games import models
@@ -363,6 +362,7 @@ def tictactoe(request):
     gofirst = request.session.get('1st', None)
     lastmove = request.session.get('last', None)
     msg = ""
+    sengmei = models.Scores.objects.all()
 
 
     if tgame == tini and player == 'ZZZ':
@@ -389,9 +389,11 @@ def tictactoe(request):
                         return redirect('tictactoe')
                     msg = "type the number where you want to make a move"
     elif (' ' not in tgame['avai'].values()) or win():
-        if win() and lastmove == 'me': msg = "You Win! Play again? Y/N"
-        elif win() and lastmove == 'notme': msg = "You Lose! Play again? Y/N"
-        else: msg = "Gameover! Play again? Y/N"
+        if win() and lastmove == 'me':
+            msg = f"You Win! Play again? Y/N Score = {models.Scores.objects.first().score}"
+
+        elif win() and lastmove == 'notme': msg = f"You Lose! Play again? Y/N Score = {models.Scores.objects.first().score}"
+        else: msg = f"Gameover! Play again? Y/N"
         if request.method == 'POST':
             subm = forms.Inputletter(request.POST)
             if subm.is_valid():
@@ -411,6 +413,14 @@ def tictactoe(request):
                     tgame['avai'][subm.cleaned_data.get('answer')] = player
                     request.session['t'] = tgame
                     request.session['last'] = 'me'
+                    if win():
+                        if not request.user.is_authenticated:
+                            if len(sengmei) == 0:
+                                models.Scores.objects.create(gamename='tictactoe', score=1)
+                            else:
+                                yukei = models.Scores.objects.first()
+                                yukei.score += 1
+                                yukei.save()
                     if not win() and ' ' in tgame['avai'].values():
                         aimove()
                         request.session['last'] = 'notme'
